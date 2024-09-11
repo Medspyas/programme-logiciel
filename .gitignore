@@ -1,2 +1,3 @@
 venv/
 data/liste_de_joueur.json
+__pycache__/
