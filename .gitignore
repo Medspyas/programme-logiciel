@@ -1,3 +1,6 @@
 venv/
-data/liste_de_joueur.json
+data/joueurs.json
+data/test_tournoi.json
 __pycache__/
+notes.txt
+

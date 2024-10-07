@@ -2,7 +2,7 @@
 
 
 class Joueur:
-    def __init__(self, nom, prenom, date_de_naissance, id_nationale, score) :
+    def __init__(self, nom, prenom, date_de_naissance, id_nationale, score):
         self.nom = nom
         self.prenom = prenom
         self.date_de_naissance = date_de_naissance
@@ -13,27 +13,50 @@ class Joueur:
         
 
     def afficher_informations_joueur(self):
-        print(f"Nom: {self.nom}; Prenom: {self.prenom}; date_de_naissance: {self.date_de_naissance}; indentifiant nationale: {self.id_nationale}; score: {self.score}") 
+        return f"Nom: {self.nom}; Prenom: {self.prenom}; date_de_naissance: {self.date_de_naissance}; indentifiant nationale: {self.id_nationale}; score: {self.score}"
     
     def mettre_a_jour_score(self, points):
         self.score += points
         return self.score
+    
+    
 
-    def __str__(self):
-        return f"{self.nom} {self.prenom} (ID: {self.id_nationale}, Score: {self.score})"
+class GestionJoueurs:
+    def __init__(self):
+        self.liste_joueurs = []
+
+    def ajouter_joueur(self, nom, prenom, date_de_naissance, id_nationale, score=0):
+        nouveau_joueur = Joueur(nom, prenom, date_de_naissance, id_nationale, score)
+        self.liste_joueurs.append(nouveau_joueur)
+    
+    def afficher_tous_les_joueurs(self):
+        if not self.liste_joueurs:
+            print("Aucun joueur")
+        else:
+            for joueur in self.liste_joueurs:
+                print(joueur.afficher_informations_joueur())
+
+    def trouver_joueur_par_id(self, id_nationale):
+        for joueur in self.liste_joueurs:
+            if joueur.id_nationale == id_nationale:
+                return joueur
+        print("Joueur introuvable.")
+        return None
+    
+    def mettre_a_jour_infos(self, joueur, attribut, nouvelle_valeur):
+        if hasattr(joueur, attribut):
+            setattr(joueur, attribut, nouvelle_valeur)
+            print(f"{attribut} de {joueur.nom} à bien été mis à jour.")
+        else:
+            print(f"L'attribut {attribut} n'existe pas.")
+    
+
+    
+    
+
+  
 
 
     
 
-joueur1 = Joueur("Dupont", "Jean", "01/01/1990", "ID001", 0)
-joueur2 = Joueur("Martin", "Alice", "15/05/1988", "ID002", 0)
-joueur3 = Joueur("Durand", "Pierre", "20/07/1992", "ID003", 0)
-joueur4 = Joueur("Leroy", "Sophie", "30/09/1991", "ID004", 0)
 
-
-print(joueur1)
-
-"""joueur1.afficher_informations_joueur()
-joueur2.afficher_informations_joueur()
-joueur3.afficher_informations_joueur()
-joueur4.afficher_informations_joueur()"""
