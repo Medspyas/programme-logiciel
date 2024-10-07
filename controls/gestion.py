@@ -190,69 +190,7 @@ class Gestion_information_tournoi(GestionDeBase):
 
 
 
-if __name__ == "__main__":
-    gestion_joueurs = GestionJoueurs()
 
-    
-    gestion_joueurs.ajouter_joueur("Dupont", "Jean", "01/01/1980", "FR12345", 0)
-    gestion_joueurs.ajouter_joueur("Martin", "Paul", "02/02/1990", "FR12346", 0)
-
-    
-    gestion_joueurs.afficher_tous_les_joueurs()
-
-    tournoi = Tournoi(
-        nom="Tournoi de Paris",
-        date_debut="2024-01-01",
-        date_fin="2024-01-05",
-        description="Un tournoi prestigieux.",
-        liste_joueurs=gestion_joueurs.liste_joueurs,
-        nb_tour=4
-    )
-
-    
-    tour_1 = Tour("Round 1", "2024-01-02 10:00", "2024-01-02 12:00")
-
-  
-    match_1 = Match(joueur_1=gestion_joueurs.liste_joueurs[0], joueur_2=gestion_joueurs.liste_joueurs[1], score_joueur_1=1, score_joueur_2=0)
-    tour_1.ajouter_match(match_1.joueur_1, match_1.joueur_2)
-    print(f"Match ajouté: {tour_1.liste_matches[0].joueur_1.nom} vs {tour_1.liste_matches[0].joueur_2.nom}")
-    
-   
-    tournoi.liste_tours.append(tour_1)
-    print(f"Nombre de tours dans le tournoi : {len(tournoi.liste_tours)}")
-    print(f"Nombre de matchs dans le tour : {len(tour_1.liste_matches)}")
-
-   
-    gestion_information_tournoi = Gestion_information_tournoi()
-
-    
-    gestion_information_tournoi.sauvegarder_tournois(tournoi, filename="test_tournoi.json")
-    print("Tournoi sauvegardé avec les tours et matchs.")
-
-    
-    tournoi_charge = gestion_information_tournoi.charger_tournoi(gestion_joueurs=gestion_joueurs, filename="test_tournoi.json")
-    if tournoi_charge:
-        print("Tournoi chargé avec succès.")
-        print(f"Nom du tournoi : {tournoi_charge.nom}")
-        print(f"Description : {tournoi_charge.description}")
-        print(f"Date de début : {tournoi_charge.date_debut}")
-        print(f"Date de fin : {tournoi_charge.date_fin}")
-        print(f"Nombre de joueurs : {len(tournoi_charge.liste_joueurs)}")
-
-        
-        for idx, tour in enumerate(tournoi_charge.liste_tours):
-            print(f"\nTour {idx + 1}: {tour.nom_tour}")
-            print(f"Début: {tour.date_et_heure_debut}, Fin: {tour.date_et_heure_fin}")
-            for match in tour.liste_matches:
-                print(f"Match: {match.joueur_1.nom} vs {match.joueur_2.nom} | Score: {match.score_joueur_1} - {match.score_joueur_2}")
-    else:
-        print("Le tournoi n'a pas pu être chargé.")
-
-    
-
-
-   
-    gestion_information_tournoi.sauvegarder_tournois(tournoi_charge, filename="test_tournoi.json")
     
 
 

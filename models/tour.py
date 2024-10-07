@@ -21,7 +21,7 @@ class Tour:
             print(resultat)
 
 
-tour1 = Tour("round1" , "02/02/2024  10:00" , "02/02/2024 14:00")
+
 
 
 
