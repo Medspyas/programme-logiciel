@@ -70,12 +70,13 @@ class ControlsPrincipal:
         self.menu.afficher_message("Les joueurs ont bien été sauvegarder.")
 
     def sauvegarder_tournoi(self):
+        print(f"DEBUG: Sauvegarde de la liste des tournois : {self.liste_tournois}")
         self.gestion_information_tournois.sauvegarder_tous_les_tournois(self.liste_tournois)
 
     def charger_tournois(self):
-        print("Chargement des tournois à partir du fichier JSON...")
+        
         tournois = self.gestion_information_tournois.charger_tous_les_tournois(self.gestion_joueur, "tournoi.json")
-        print("Chargement des tournois à partir du fichier JSON...")
+        
 
         if not tournois:
             self.menu.afficher_message("Aucun tournoi à charger")
@@ -89,7 +90,10 @@ class ControlsPrincipal:
             selecion_tournoi = tournois[choix - 1]
             self.controls_tournois = ControlsTournois(selecion_tournoi)
 
-            self.controls_tournois.tournoi.tour_en_cours = len(self.controls_tournois.tournoi.liste_tours)
+            self.controls_tournois.tournoi.tour_en_cours = selecion_tournoi.tour_en_cours
+
+            if selecion_tournoi not in self.liste_tournois:
+                self.liste_tournois.append(selecion_tournoi)
                                      
         else:
             self.menu.afficher_message("Veuillez choisir un numero parmis la liste ci-dessus.")
@@ -190,9 +194,11 @@ class ControlsPrincipal:
             date_heure_debut = self.menu.demander_information("Entrez la date et le l'heure du début (JJ/MM/AAA HH:MM): ")
 
             for i in range(self.controls_tournois.nb_tour):
+                
                 self.menu.afficher_message(f"Lancement du tour {i+1}/{self.controls_tournois.nb_tour}")
                 print(f"Liste des joueurs pour le tour : {[joueur.nom for joueur in self.controls_tournois.tournoi.liste_joueurs]}")
                 self.controls_tournois.lancer_nouveau_tour(date_heure_debut)
+               
                 self.entrer_resultats_tour()
 
                 dernier_tour = self.controls_tournois.tournoi.liste_tours[-1]
@@ -201,7 +207,11 @@ class ControlsPrincipal:
                 date_heure_fin = self.menu.demander_information("Entrez la date de fin du tour (JJ/MM/AAA HH:MM): ")
                 dernier_tour.date_et_heure_fin = date_heure_fin
 
+               
+                self.controls_tournois.tournoi.tour_en_cours += 1
+               
                 self.sauvegarder_tournoi()
+                
 
                 if not self.demander_continuer_ou_quitter():
                     break
@@ -213,17 +223,24 @@ class ControlsPrincipal:
             date_heure_debut = self.menu.demander_information("Entrez la date et le l'heure du début (JJ/MM/AAA HH:MM): ")
 
             for i in range(self.controls_tournois.tournoi.tour_en_cours, self.controls_tournois.tournoi.nb_tour):
+                
                 self.menu.afficher_message(f"{self.controls_tournois.tournoi.tour_en_cours+1}/{self.controls_tournois.tournoi.nb_tour}")
                 self.controls_tournois.lancer_nouveau_tour(date_heure_debut)
                 self.entrer_resultats_tour()
                 
-                dernier_tour = self.controls_tournois.tournoi.liste_tours[i]
+                dernier_tour = self.controls_tournois.tournoi.liste_tours[-1]
                 dernier_tour.afficher_matchs()
 
                 date_heure_fin = self.menu.demander_information("Entrez la date de fin du tour (JJ/MM/AAA HH:MM): ")
                 dernier_tour.date_et_heure_fin = date_heure_fin
 
+
+                self.controls_tournois.tournoi.tour_en_cours += 1
+                
+
+                
                 self.sauvegarder_tournoi()
+                
                 
                 if not self.demander_continuer_ou_quitter():
                     break
@@ -251,18 +268,27 @@ class ControlsPrincipal:
     def entrer_resultats_tour(self):
         
         dernier_tour = self.controls_tournois.tournoi.liste_tours[-1]
-        print(f"Nombre de matchs dans ce tour: {len(dernier_tour.liste_matches)}")
+      
         for match in dernier_tour.liste_matches:
+            if match.score_joueur_1 !=0 or match.score_joueur_2 !=0:
+                continue
+
             self.menu.afficher_message(f"{match.joueur_1.nom} contre {match.joueur_2.nom}")
             self.menu.afficher_message("1: Joueur 1 gagne")
             self.menu.afficher_message("2: Joueur 2 gagne")
             self.menu.afficher_message("3: Nul")
 
-            try:
-                resultat = int(self.menu.demander_information("Entrez le resultat (1, 2 ou 3): "))
-            except ValueError:
-                self.menu.afficher_message("Erreur : veuillez entrer un nombre entier.")
-                continue
+            while True:
+                try:
+                    resultat = int(self.menu.demander_information("Entrez le resultat (1, 2 ou 3): "))
+                    
+                    if resultat in [1, 2, 3]:
+                        break
+                    else:
+                        self.menu.afficher_message("Résultat invalide, veuillez réessayez;")
+                except ValueError:
+                    self.menu.afficher_message("Erreur : veuillez entrer un nombre entier.")
+                    continue
 
             if resultat == 1:
                 self.menu.afficher_message(f"{match.joueur_1.nom} a gagné.")
@@ -270,6 +296,7 @@ class ControlsPrincipal:
                 match.joueur_2.mettre_a_jour_score(0)
                 match.score_joueur_1 = 1
                 match.score_joueur_2 = 0
+                
 
             elif resultat ==2:
                 self.menu.afficher_message(f"{match.joueur_2.nom} a gagné.")
@@ -277,17 +304,20 @@ class ControlsPrincipal:
                 match.joueur_2.mettre_a_jour_score(1)
                 match.score_joueur_1 = 0
                 match.score_joueur_2 = 1
+                
+
             elif resultat ==3:
                 self.menu.afficher_message("Match nul.")
                 match.joueur_1.mettre_a_jour_score(0.5)
                 match.joueur_2.mettre_a_jour_score(0.5)
                 match.score_joueur_1 = 0.5
                 match.score_joueur_2 = 0.5
-            else:
-                self.menu.afficher_message("Résultat invalide, veuillez réessayez.")
-                self.entrer_resultats_tour()
+                
+            
+                
 
-        self.controls_tournois.terminer_tour()
+        #self.controls_tournois.terminer_tour()
+        
 
    
 
@@ -295,6 +325,8 @@ class ControlsPrincipal:
     def demander_continuer_ou_quitter(self):
         choix = self.menu.demander_information("Voulez continuer ou quitter ? ")
         if choix == "q":
+            print("DEBUG: Appel de la sauvegarde avant de quitter.")
+            self.sauvegarder_tournoi()
             self.menu.afficher_message("Vous avez quitté le tournois.")
             return False
         elif choix == "c":

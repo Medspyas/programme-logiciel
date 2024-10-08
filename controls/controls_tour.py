@@ -20,7 +20,7 @@ class ControlsTour:
     def verifier_rencontre_joueurs(self, joueur_1, joueur_2):
         for tour in self.tournoi.liste_tours:
             for match in tour.liste_matches:
-                if (match.joueur_1 == joueur_1) and (match.joueur_2 == joueur_2) or (match.joueur_1 == joueur_2) and (match.joueur_2 == joueur_1):
+                if (match.joueur_1 == joueur_1 and match.joueur_2 == joueur_2) or (match.joueur_1 == joueur_2 and match.joueur_2 == joueur_1):
                     return True
         return False
 

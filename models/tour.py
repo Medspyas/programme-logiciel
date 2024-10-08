@@ -21,7 +21,7 @@ class Tour:
             print(resultat)
 
 
-
+ 
 
 
 

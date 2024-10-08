@@ -22,10 +22,15 @@ class GestionDeBase:
 
     def sauvegarder_fichier(self, filename, data):
         chemin_fichier = self.chemin_fichier(filename)
+        print(f"DEBUG: Chemin du fichier de sauvegarde: {chemin_fichier}")
+        try:
+            with open(chemin_fichier, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+                print(f"DEBUG: Données sauvegardées avec succès dans le fichier {filename}")
+        except Exception as e:
+            print(f"ERREUR: Impossible de sauvegarder les données. Détails: {e}")            
 
-        with open(chemin_fichier, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-    
+
     def charger_fichier(self, filename):
         chemin_fichier = self.chemin_fichier(filename)
         if os.path.exists(chemin_fichier):
@@ -90,6 +95,7 @@ class Gestion_information_tournoi(GestionDeBase):
         tournois_dict = {t_existant["nom"]: t_existant for t_existant in tournois_existants}
 
         for tournoi in tournois:
+            print(f"DEBUG: Sauvegarde du tournoi {tournoi.nom} au tour {tournoi.tour_en_cours}")
             tournois_dict[tournoi.nom] = {
                 "nom": tournoi.nom,
                 "date_debut": tournoi.date_debut,
@@ -120,7 +126,7 @@ class Gestion_information_tournoi(GestionDeBase):
                 
             }
         
-        
+        print(f"DEBUG: Données du tournoi avant écriture dans le fichier: {tournois_dict}")
         self.sauvegarder_fichier(filename, list(tournois_dict.values()))
 
     
@@ -141,6 +147,7 @@ class Gestion_information_tournoi(GestionDeBase):
                 )
 
                 tournoi.tour_en_cours = tournoi_data.get("tour_en_cours", 0)
+                print(f"Tournoi chargé: {tournoi.nom}, Tour en cours: {tournoi.tour_en_cours}")  
 
                 for id_nationale in tournoi_data["joueurs"]:
                     joueur = gestion_joueurs.trouver_joueur_par_id(id_nationale)

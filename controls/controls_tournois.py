@@ -27,6 +27,7 @@ class ControlsTournois:
         nb_tour_actuel = len(self.tournoi.liste_tours)
 
         if nb_tour_actuel >= self.nb_tour:
+          
             print("Tournois terminer. tous les tours ont été joués.")
             return
         
