@@ -12,12 +12,13 @@ from view.menu import MenuPrincipal
 from controls.gestion import *
 
 class ControlsPrincipal:
-    def __init__(self, menu, controls_joueurs, gestion_information_joueur, gestion_information_tournois, gestion_joueur, controls_tours, controls_tournois):
+    def __init__(self, menu, controls_joueurs, gestion_information_joueur, gestion_information_tournois, gestion_joueur, gestion_rapports, controls_tours, controls_tournois):
         self.menu = menu
         self.controls_joueurs = controls_joueurs
         self.gestion_information_joueur = gestion_information_joueur
         self.gestion_information_tournois = gestion_information_tournois
         self.gestion_joueur = gestion_joueur
+        self.gestion_rapports = gestion_rapports
         self.controls_tours = controls_tours
         self.controls_tournois = controls_tournois
         self.liste_tournois = []
@@ -30,10 +31,8 @@ class ControlsPrincipal:
                 self.gerer_joueur()
             elif choix_principal == '2':
                 self.gerer_tournois()
-                self.menu.afficher_message("menu tournoi")
             elif choix_principal == '3':
-                #self.gestion_rapport()
-                self.menu.afficher_message("menu rapport")
+                self.gerer_rapport()
             elif choix_principal == '4':
                 self.menu.afficher_message("Quittez le programme")
                 break
@@ -54,11 +53,37 @@ class ControlsPrincipal:
             else:
                 self.menu.afficher_message("Choix invalide , réessayer")
 
+    def gerer_rapport(self):
+        choix = self.menu.afficher_menu_rapport()
+        if choix == "1":
+            joueurs = self.gestion_rapports.afficher_joueurs_alphabetique()
+            for joueur in joueurs:
+                self.menu.afficher_message(joueur)
+        elif choix == "2":
+            tournois = self.gestion_rapports.afficher_tournois()
+            for tournoi in tournois:
+                self.menu.afficher_message(tournoi)
+        elif choix == "3":
+            nom_tournoi = self.menu.demander_information("Entre le nom du tournoi : ")
+            details = self.gestion_rapports.afficher_details_tournoi(nom_tournoi, self.gestion_joueur)
+            for detail in details:
+                self.menu.afficher_message(detail)
+        elif choix =="4":
+            nom_tournoi = self.menu.demander_information("Entre le nom du tournoi : ")
+            tours_et_matchs = self.gestion_rapports.afficher_tours_et_matchs(nom_tournoi)
+            for tour in tours_et_matchs:
+                self.menu.afficher_message(tour)
+        else:
+            self.menu.afficher_message("Choix invalide réessayer")
+            
+        
+
+
     def ajouter_joueur(self):
         nom = self.menu.demander_information("Entrez le nom : ")
         prenom = self.menu.demander_information("Entrez le prenom : ")
-        date_de_naissance = self.menu.demander_information("Entrez la date de naissance (JJ/MM/AAA): ")
-        id_nationale = self.menu.demander_information("Entre l' ID nationale: ( ex: AA111)")
+        date_de_naissance = self.menu.demander_information("Entrez la date de naissance (JJ/MM/AAA) : ")
+        id_nationale = self.menu.demander_information("Entre l' ID nationale: ( ex: AA111): ")
 
         self.controls_joueurs.ajouter_joueur(nom, prenom, date_de_naissance, id_nationale)
         self.sauvegarder_joueurs()
@@ -75,7 +100,7 @@ class ControlsPrincipal:
 
     def charger_tournois(self):
         
-        tournois = self.gestion_information_tournois.charger_tous_les_tournois(self.gestion_joueur, "tournoi.json")
+        tournois = self.gestion_information_tournois.charger_tous_les_tournois(self.gestion_joueur, "tournois.json")
         
 
         if not tournois:
@@ -335,6 +360,7 @@ class ControlsPrincipal:
             self.menu.afficher_message("Choix invalide, réessayer.")
             return self.demander_continuer_ou_quitter()
         
+ 
         
 
 
@@ -347,13 +373,13 @@ def main():
     gestion_information_tournoi = Gestion_information_tournoi()
     joueurs_charges = gestion_information_joueur.charger_joueurs()
     gestion_joueur.liste_joueurs = joueurs_charges
-
+    gestion_rapports = GestionRapport()
     if not gestion_joueur.liste_joueurs:
         menu.afficher_message("Auncun joueur n'a été trouvé. Ajouter des joueurs.2")
     #controls_tour = ControlsTour(None, None)
     #controls_tournois = ControlsTournois(None)
 
-    controls_principal = ControlsPrincipal(menu, controls_joueur, gestion_information_joueur, gestion_information_tournoi, gestion_joueur, None, None)
+    controls_principal = ControlsPrincipal(menu, controls_joueur, gestion_information_joueur, gestion_information_tournoi, gestion_joueur, gestion_rapports, None, None)
 
     controls_principal.lancer_menu_principal()
 

@@ -35,12 +35,11 @@ class MenuPrincipal:
 
     def afficher_menu_rapport(self):
         print("\nMenu Rapports:")
-        print("1. Afficher listes joueurs")
-        print("2. Afficher les tournois")
-        print("3. Afficher infos tournois")
-        print("4. Afficher listes joueurs d'un tournois")
-        print("5. Afficher listes tours et matchs d'un tournois")
-        print("6. Retour au menu principal")
+        print("1. Listes joueurs par odre alphabétique")
+        print("2. Listes des tournois")
+        print("3. Information d'un tournois")
+        print("4. Listes tours et matchs d'un tournois")
+        print("5. Retour au menu principal")
         return input("Faite votre choix : ")
 
 

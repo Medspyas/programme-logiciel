@@ -88,7 +88,7 @@ class Gestion_information_joueur(GestionDeBase):
         return joueurs
 
 class Gestion_information_tournoi(GestionDeBase):
-    def sauvegarder_tous_les_tournois(self, tournois, filename= "tournoi.json"):
+    def sauvegarder_tous_les_tournois(self, tournois, filename= "tournois.json"):
         
         tournois_existants = self.charger_fichier(filename) or []
 
@@ -122,6 +122,7 @@ class Gestion_information_tournoi(GestionDeBase):
                     }
                     for tour in tournoi.liste_tours                  
                 ],
+                "nb_tour" : tournoi.nb_tour,
                 "tour_en_cours" : tournoi.tour_en_cours
                 
             }
@@ -193,9 +194,46 @@ class Gestion_information_tournoi(GestionDeBase):
         return tournoi
 
     
-            
+class GestionRapport(GestionDeBase):
 
+    def afficher_joueurs_alphabetique(self, filename="joueurs.json"):
+        joueurs = self.charger_fichier(filename)
+        joueurs_trier= sorted(joueurs, key=lambda joueur:joueur["nom"])
+        return [f"{joueur['nom']}, {joueur['prenom']}, ID: {joueur['id_nationale']}" for joueur in joueurs_trier]
 
+    def afficher_tournois(self, filename="tournois.json"):
+        tournois = self.charger_fichier(filename)
+        return [f"{tournoi['nom']}, du {tournoi['date_debut']} au {tournoi['date_fin']}; {tournoi['description']}; {tournoi['nb_tour']} tours" for tournoi in tournois]
+
+    def afficher_details_tournoi(self, nom_tournoi, gestion_joueur, filename="tournois.json"):
+        tournois = self.charger_fichier(filename)
+        tournoi = next((t for t in tournois if t["nom"] == nom_tournoi), None)
+        if tournoi:
+            details = [f"Nom du tournoi: {tournoi['nom']}" , f"Dates: {tournoi['date_debut']} ; {tournoi['date_fin']}", f"Description: {tournoi['description']}"]
+            details.append("Liste joueurs :")
+            for id_joueur in tournoi["joueurs"]:
+                joueur = gestion_joueur.trouver_joueur_par_id(id_joueur)
+                if joueur:
+                    details.append(f"{joueur.nom}; {joueur.prenom}")
+                else:
+                    details.append(f"Joueur avec ID {id_joueur} non trouvé.")            
+            return details
+        return ["Tournoi non trouvé."]
+    
+    def afficher_tours_et_matchs(self , nom_tournoi, filename="tournois.json"):
+        tournois = self.charger_fichier(filename)
+        tournoi = next((t for t in tournois if t["nom"] == nom_tournoi), None)
+        if tournoi:
+            details= []
+            for tour in tournoi['tours']:
+                details.append(f"{tour['nom_tour']}; Début : {tour['date_et_heure_debut']}; Fin : {tour['date_et_heure_fin']}")
+
+                for match in tour["matches"]:
+                    details.append(f"{match['joueur_1']} vs {match['joueur_2']}; Score {match['score_joueur_1']} - {match['score_joueur_2']}")
+            return details
+        return ["Tournoi non trouvé"]
+
+#details.append([f"{match['joueur_1']} vs {match['joueur_2']}; Score {match['score_joueur_1']} points - {match['score_joueur_2']}" for match in tour['matches']])
 
 
     
