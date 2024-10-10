@@ -8,6 +8,7 @@ class Joueur:
         self.date_de_naissance = date_de_naissance
         self.id_nationale = id_nationale
         self.score = score
+       
 
         
         
@@ -22,8 +23,9 @@ class Joueur:
     
 
 class GestionJoueurs:
-    def __init__(self):
+    def __init__(self, menu):
         self.liste_joueurs = []
+        self.menu = menu
 
     def ajouter_joueur(self, nom, prenom, date_de_naissance, id_nationale, score=0):
         nouveau_joueur = Joueur(nom, prenom, date_de_naissance, id_nationale, score)
@@ -31,24 +33,24 @@ class GestionJoueurs:
     
     def afficher_tous_les_joueurs(self):
         if not self.liste_joueurs:
-            print("Aucun joueur")
+            self.menu.afficher_message("Aucun joueur")
         else:
             for joueur in self.liste_joueurs:
-                print(joueur.afficher_informations_joueur())
+                self.menu.afficher_message(joueur.afficher_informations_joueur())
 
     def trouver_joueur_par_id(self, id_nationale):
         for joueur in self.liste_joueurs:
             if joueur.id_nationale == id_nationale:
                 return joueur
-        print("Joueur introuvable.")
+        self.menu.afficher_message("Joueur introuvable.")
         return None
     
     def mettre_a_jour_infos(self, joueur, attribut, nouvelle_valeur):
         if hasattr(joueur, attribut):
             setattr(joueur, attribut, nouvelle_valeur)
-            print(f"{attribut} de {joueur.nom} à bien été mis à jour.")
+            self.menu.afficher_message(f"{attribut} de {joueur.nom} à bien été mis à jour.")
         else:
-            print(f"L'attribut {attribut} n'existe pas.")
+            self.menu.afficher_message(f"L'attribut {attribut} n'existe pas.")
     
 
     

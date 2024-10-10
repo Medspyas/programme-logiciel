@@ -15,9 +15,8 @@ class Tournoi:
         self.tour_en_cours = 0
 
 
-    def ajouter_tour(self, nom_tour, date_et_heure_debut, date_et_heure_fin):
-        nouveau_tour = Tour(nom_tour, date_et_heure_debut, date_et_heure_fin)
-        self.liste_tours.append(nouveau_tour)
+    def ajouter_tour(self, tour):
+        self.liste_tours.append(tour)
         return self.liste_tours
     
     

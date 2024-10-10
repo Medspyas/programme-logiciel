@@ -9,10 +9,10 @@ from view.menu import MenuPrincipal
 
 
 class ControlsTour:
-    def __init__(self, tour, tournoi):
+    def __init__(self, tour, tournoi, menu):
         self.tour = tour
         self.tournoi = tournoi
-        self.menu = MenuPrincipal()
+        self.menu = menu
         self.tour_terminer = False
         
         

@@ -10,7 +10,6 @@ class Match:
 
 
     def stockage_resultat_joueur(self):
-        print(f"Stockage des résultats: {self.joueur_1.nom}: {self.score_joueur_1}, {self.joueur_2.nom}: {self.score_joueur_2}")  # Ajout pour débogage
         liste_1 = [f"{self.joueur_1.nom} {self.joueur_1.prenom}", self.score_joueur_1]
         liste_2 = [f"{self.joueur_2.nom} {self.joueur_2.prenom}", self.score_joueur_2]
         return (liste_1, liste_2)

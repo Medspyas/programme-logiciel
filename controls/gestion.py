@@ -22,13 +22,10 @@ class GestionDeBase:
 
     def sauvegarder_fichier(self, filename, data):
         chemin_fichier = self.chemin_fichier(filename)
-        print(f"DEBUG: Chemin du fichier de sauvegarde: {chemin_fichier}")
-        try:
-            with open(chemin_fichier, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=4)
-                print(f"DEBUG: Données sauvegardées avec succès dans le fichier {filename}")
-        except Exception as e:
-            print(f"ERREUR: Impossible de sauvegarder les données. Détails: {e}")            
+        with open(chemin_fichier, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+            
+                 
 
 
     def charger_fichier(self, filename):
@@ -95,7 +92,7 @@ class Gestion_information_tournoi(GestionDeBase):
         tournois_dict = {t_existant["nom"]: t_existant for t_existant in tournois_existants}
 
         for tournoi in tournois:
-            print(f"DEBUG: Sauvegarde du tournoi {tournoi.nom} au tour {tournoi.tour_en_cours}")
+            
             tournois_dict[tournoi.nom] = {
                 "nom": tournoi.nom,
                 "date_debut": tournoi.date_debut,
@@ -127,13 +124,12 @@ class Gestion_information_tournoi(GestionDeBase):
                 
             }
         
-        print(f"DEBUG: Données du tournoi avant écriture dans le fichier: {tournois_dict}")
+        
         self.sauvegarder_fichier(filename, list(tournois_dict.values()))
 
     
     def charger_tous_les_tournois(self, gestion_joueurs, filename):
         data = self.charger_fichier(filename)
-        print(f"Fichier JSON chargé : {data}")
         tournois = []
 
         if data:
@@ -148,12 +144,11 @@ class Gestion_information_tournoi(GestionDeBase):
                 )
 
                 tournoi.tour_en_cours = tournoi_data.get("tour_en_cours", 0)
-                print(f"Tournoi chargé: {tournoi.nom}, Tour en cours: {tournoi.tour_en_cours}")  
-
+                
                 for id_nationale in tournoi_data["joueurs"]:
                     joueur = gestion_joueurs.trouver_joueur_par_id(id_nationale)
                     if joueur:
-                        print(f"Joueur trouvé : {joueur.nom} (ID : {id_nationale})")
+                        
                         tournoi.liste_joueurs.append(joueur)
                     else:
                         print(f"Joueur avec ID {id_nationale} introuvable.")
@@ -164,7 +159,7 @@ class Gestion_information_tournoi(GestionDeBase):
                         date_et_heure_debut = tour_data["date_et_heure_debut"],
                         date_et_heure_fin = tour_data["date_et_heure_fin"]
                     )
-                    print(f"Chargement du {tour_data['nom_tour']}") 
+                    
                     for match_data in tour_data["matches"]:
                         joueur_1 = gestion_joueurs.trouver_joueur_par_id(match_data["joueur_1"])
                         joueur_2 = gestion_joueurs.trouver_joueur_par_id(match_data["joueur_2"])
@@ -172,7 +167,7 @@ class Gestion_information_tournoi(GestionDeBase):
 
                         if joueur_1 and joueur_2:
                             match = Match(joueur_1 , joueur_2, match_data["score_joueur_1"], match_data["score_joueur_2"])
-                            print(f"Match chargé : {joueur_1.nom} vs {joueur_2.nom}")
+                            
                             
                             tour.liste_matches.append(match)
                     tournoi.liste_tours.append(tour)

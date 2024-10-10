@@ -95,7 +95,6 @@ class ControlsPrincipal:
         self.menu.afficher_message("Les joueurs ont bien été sauvegarder.")
 
     def sauvegarder_tournoi(self):
-        print(f"DEBUG: Sauvegarde de la liste des tournois : {self.liste_tournois}")
         self.gestion_information_tournois.sauvegarder_tous_les_tournois(self.liste_tournois)
 
     def charger_tournois(self):
@@ -113,13 +112,14 @@ class ControlsPrincipal:
         choix = int(self.menu.demander_information("Selectionner tournoi à charger: "))
         if 1 <= choix <= len(tournois):
             selecion_tournoi = tournois[choix - 1]
-            self.controls_tournois = ControlsTournois(selecion_tournoi)
+            self.controls_tournois = ControlsTournois(selecion_tournoi, self.menu)
 
             self.controls_tournois.tournoi.tour_en_cours = selecion_tournoi.tour_en_cours
 
             if selecion_tournoi not in self.liste_tournois:
                 self.liste_tournois.append(selecion_tournoi)
-                                     
+            
+            self.continuer_tournoi()
         else:
             self.menu.afficher_message("Veuillez choisir un numero parmis la liste ci-dessus.")
             self.charger_tournois()
@@ -160,7 +160,7 @@ class ControlsPrincipal:
             if choix_tournoi == "1": 
                 self.creer_tournoi()
             elif choix_tournoi == "2":
-                self.lancer_tournoi()        
+                self.charger_tournois()    
             elif choix_tournoi == "3":
                 self.sauvegarder_tournoi()
             elif choix_tournoi == "4":
@@ -170,10 +170,25 @@ class ControlsPrincipal:
                 self.menu.afficher_message("Choix invalide, réessayez.")
 
     def creer_tournoi(self):
-        nom_tournoi = self.menu.demander_information("Entre le nom du tournoi")
-        date_debut_tournoi = self.menu.demander_information("Entre la date du début du tournoi") 
-        date_fin_tournoi= self.menu.demander_information("Entre la date de fin du tournoi")
-        description = self.menu.demander_information("Entrez la description du tournoi")
+        while True:
+
+            nom_tournoi = self.menu.demander_information("Entre le nom du tournoi: ")
+            if not nom_tournoi.strip():
+                self.menu.afficher_message("Le nom du tournoi ne peut pas être vide.")
+                continue
+            date_debut_tournoi = self.menu.demander_information("Entre la date du début du tournoi: ") 
+            if not date_debut_tournoi.strip():
+                self.menu.afficher_message("La date de debut du tournoi ne peut pas être vide.")
+                continue
+            date_fin_tournoi= self.menu.demander_information("Entre la date de fin du tournoi: ")
+            if not date_fin_tournoi.strip():
+                self.menu.afficher_message("La date de fin du tournoi ne peut pas être vide.")
+                continue
+            description = self.menu.demander_information("Entrez la description du tournoi: ")
+            if not description.strip():
+                self.menu.afficher_message("La description du tournoi ne peut pas être vide.")                
+                continue
+            break
 
         joueurs_disponible = self.gestion_joueur.liste_joueurs
         self.afficher_joueur(joueurs_disponible)
@@ -182,9 +197,9 @@ class ControlsPrincipal:
 
         tournoi = Tournoi(nom_tournoi, date_debut_tournoi, date_fin_tournoi, description, selection_joueur, nb_tour=4)
 
-        self.controls_tournois = ControlsTournois(tournoi)
-
+        self.controls_tournois = ControlsTournois(tournoi, self.menu)
         self.liste_tournois.append(tournoi)
+        self.lancer_tournoi()
 
     def afficher_joueur(self, joueurs):
         self.menu.afficher_message("Listes joueur: ")
@@ -192,59 +207,69 @@ class ControlsPrincipal:
             self.menu.afficher_message(f"{joueur.id_nationale} - {joueur.nom} {joueur.prenom}")
 
     def selectionner_joueurs(self, joueurs):
-        id_joueurs = self.menu.demander_information("Entrez les ID des joueurs participants, séparer les par des virgules :")
-        id_joueurs = id_joueurs.split(",")
+        while True:
+            id_joueurs = self.menu.demander_information("Entrez les ID des joueurs participants, séparer les par des virgules :")
 
-        joueurs_selectionnes = []
-        for id_joueur in id_joueurs:
-            id_joueur = id_joueur.strip()
-            joueur_trouver = False
-            for joueur in joueurs:
-                if joueur.id_nationale == id_joueur:
-                    joueurs_selectionnes.append(joueur)
-                    joueur_trouver = True
+            id_joueurs = [id_joueur.strip() for id_joueur in id_joueurs.split(",")]
+
+            if len(id_joueurs) < 8:
+                self.menu.afficher_message("Erreur : vous devez entrer au moins 8 ID de joueurs pour créer un tournoi.")
+                continue
+
+            joueurs_selectionnes = []
+            ids_deja_selectionnes = set()
+            erreur_detectee = False
+
+            for id_joueur in id_joueurs:
+                if id_joueur in ids_deja_selectionnes:
+                            self.menu.afficher_message(f"l'ID {id_joueur} a déja été sélectionné.")
+                            erreur_detectee = True
+                            break
+                
+                joueur_trouver = False       
+                for joueur in joueurs:
+                    if joueur.id_nationale == id_joueur:
+                        joueurs_selectionnes.append(joueur)
+                        ids_deja_selectionnes.add(id_joueur)
+                        joueur_trouver = True
+                        break
+                if not joueur_trouver:
+                    self.menu.afficher_message("l'ID n'éxiste pas.")
+                    erreur_detectee = True
                     break
-            if not joueur_trouver:
-                self.menu.afficher_message("l'ID n'éxiste pas.")
-        return joueurs_selectionnes
+            if erreur_detectee:
+                self.menu.afficher_message("Veuillez recommencer")
+                continue
+            return joueurs_selectionnes
     
     def lancer_tournoi(self):
         if not self.controls_tournois:
             self.menu.afficher_message("Tournoi non créé")
+            return
+
+        date_heure_debut = self.menu.demander_information("Entrez la date et le l'heure du début (JJ/MM/AAA HH:MM): ")
+
+        for i in range(self.controls_tournois.nb_tour):
+            self.menu.afficher_message(f"Lancement du tour {i+1}/{self.controls_tournois.nb_tour}")
+            self.controls_tournois.lancer_nouveau_tour(date_heure_debut)
+            self.entrer_resultats_tour()
+            dernier_tour = self.controls_tournois.tournoi.liste_tours[-1]
+            dernier_tour.afficher_matchs()
+            date_heure_fin = self.menu.demander_information("Entrez la date de fin du tour (JJ/MM/AAA HH:MM): ")
+            dernier_tour.date_et_heure_fin = date_heure_fin
             
+            self.controls_tournois.tournoi.tour_en_cours += 1
+            
+            self.sauvegarder_tournoi()
+            
+            if not self.demander_continuer_ou_quitter():
+                break
+            date_heure_debut = date_heure_fin 
 
-        choix = self.menu.demander_information("(1) Lancer tournois crée ou (2) Charger tournois existant")
+        if self.controls_tournois.tournoi.tour_en_cours == self.controls_tournois.nb_tour:
+            self.generer_classement()
 
-        if choix == "1":
-            date_heure_debut = self.menu.demander_information("Entrez la date et le l'heure du début (JJ/MM/AAA HH:MM): ")
-
-            for i in range(self.controls_tournois.nb_tour):
-                
-                self.menu.afficher_message(f"Lancement du tour {i+1}/{self.controls_tournois.nb_tour}")
-                print(f"Liste des joueurs pour le tour : {[joueur.nom for joueur in self.controls_tournois.tournoi.liste_joueurs]}")
-                self.controls_tournois.lancer_nouveau_tour(date_heure_debut)
-               
-                self.entrer_resultats_tour()
-
-                dernier_tour = self.controls_tournois.tournoi.liste_tours[-1]
-                dernier_tour.afficher_matchs()
-
-                date_heure_fin = self.menu.demander_information("Entrez la date de fin du tour (JJ/MM/AAA HH:MM): ")
-                dernier_tour.date_et_heure_fin = date_heure_fin
-
-               
-                self.controls_tournois.tournoi.tour_en_cours += 1
-               
-                self.sauvegarder_tournoi()
-                
-
-                if not self.demander_continuer_ou_quitter():
-                    break
-                date_heure_debut = date_heure_fin   
-        elif choix == "2":
-            self.charger_tournois()
-            if not self.controls_tournois:
-                return
+    def continuer_tournoi(self):
             date_heure_debut = self.menu.demander_information("Entrez la date et le l'heure du début (JJ/MM/AAA HH:MM): ")
 
             for i in range(self.controls_tournois.tournoi.tour_en_cours, self.controls_tournois.tournoi.nb_tour):
@@ -271,17 +296,14 @@ class ControlsPrincipal:
                     break
 
                 date_heure_debut = date_heure_fin
-        else:
-            self.menu.afficher_message("Choix incorrecte, retour au menu principal")
-            return
-
-
-
-
-        self.generer_classement()
+                
+            if self.controls_tournois.tournoi.tour_en_cours == self.controls_tournois.nb_tour:
+                self.generer_classement()
 
     def generer_classement(self):
         joueurs = self.controls_tournois.tournoi.liste_joueurs
+
+        
 
         classement = sorted(joueurs, key=lambda joueur: joueur.score, reverse=True)
 
@@ -367,7 +389,7 @@ class ControlsPrincipal:
 
 def main():
     menu = MenuPrincipal()
-    gestion_joueur = GestionJoueurs()
+    gestion_joueur = GestionJoueurs(menu)
     gestion_information_joueur = Gestion_information_joueur()
     controls_joueur = ControlsJoueur(gestion_joueur)
     gestion_information_tournoi = Gestion_information_tournoi()
