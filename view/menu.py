@@ -1,10 +1,6 @@
-
-
-
 class MenuPrincipal:
     def __init__(self):
         print("Bienvenue dans le gestionnaire de tournois d'échecs")
-
 
     def afficher_menu(self):
         print("\nMenu Principal:")
@@ -20,9 +16,7 @@ class MenuPrincipal:
         print("2. Modifier un joueur")
         print("3. Sauvegarder les joueurs")
         print("4. Retour au menu principal")
-        return  input("Faite votre choix : ")
-    
-
+        return input("Faite votre choix : ")
 
     def afficher_menu_tournois(self):
         print("\nMenu Gestion des Tournois:")
@@ -31,7 +25,6 @@ class MenuPrincipal:
         print("3. Sauvegarder tournois")
         print("4. Retour au menu principal")
         return input("Faite votre choix : ")
-    
 
     def afficher_menu_rapport(self):
         print("\nMenu Rapports:")
@@ -42,7 +35,6 @@ class MenuPrincipal:
         print("5. Retour au menu principal")
         return input("Faite votre choix : ")
 
-
     def afficher_message(self, message):
         print(message)
 
@@ -51,7 +43,3 @@ class MenuPrincipal:
 
     def demander_les_ids_nationales(self):
         return input("Entrez les ID des joueurs participants, séparer les par des virgules :")
-    
-    
-    
-

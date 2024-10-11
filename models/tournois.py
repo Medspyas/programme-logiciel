@@ -1,8 +1,3 @@
-from models.tour import Tour
-from models.joueur import Joueur , GestionJoueurs
-
-
-
 class Tournoi:
     def __init__(self, nom, date_debut, date_fin, description, liste_joueurs, nb_tour):
         self.nom = nom
@@ -10,14 +5,10 @@ class Tournoi:
         self.date_fin = date_fin
         self.nb_tour = nb_tour
         self.liste_joueurs = liste_joueurs
-        self.liste_tours = [] 
+        self.liste_tours = []
         self.description = description
         self.tour_en_cours = 0
-
 
     def ajouter_tour(self, tour):
         self.liste_tours.append(tour)
         return self.liste_tours
-    
-    
-        
