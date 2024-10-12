@@ -8,6 +8,7 @@ class Tournoi:
         self.liste_tours = []
         self.description = description
         self.tour_en_cours = 0
+        self.classement = []
 
     def ajouter_tour(self, tour):
         self.liste_tours.append(tour)

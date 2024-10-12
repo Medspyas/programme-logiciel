@@ -13,7 +13,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 class GestionDeBase:
     def __init__(self, dossier_data="data"):
-        self.dossier_data = dossier_data
+        self.dossier_data = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", dossier_data))
         if not os.path.exists(self.dossier_data):
             os.makedirs(self.dossier_data)
 
@@ -117,12 +117,15 @@ class Gestion_information_tournoi(GestionDeBase):
                 ],
                 "nb_tour": tournoi.nb_tour,
                 "tour_en_cours": tournoi.tour_en_cours,
+                "classement": tournoi.classement,
             }
 
         self.sauvegarder_fichier(filename, list(tournois_dict.values()))
 
     def charger_tous_les_tournois(self, gestion_joueurs, filename):
         data = self.charger_fichier(filename)
+        if not data:
+            return []
         tournois = []
 
         if data:
@@ -137,6 +140,8 @@ class Gestion_information_tournoi(GestionDeBase):
                 )
 
                 tournoi.tour_en_cours = tournoi_data.get("tour_en_cours", 0)
+
+                tournoi.classement = tournoi_data.get("classement", [])
 
                 for id_nationale in tournoi_data["joueurs"]:
                     joueur = gestion_joueurs.trouver_joueur_par_id(id_nationale)
@@ -209,6 +214,14 @@ class GestionRapport(GestionDeBase):
                     details.append(f"{joueur.nom}; {joueur.prenom}")
                 else:
                     details.append(f"Joueur avec ID {id_joueur} non trouvé.")
+
+            details.append("Classement final :")
+            if "classement" in tournoi:
+                for i, (nom, prenom, score) in enumerate(tournoi["classement"], start=1):
+                    details.append(f"{i}. {nom} {prenom}. Score: {score} points")
+            else:
+                details.append("Classement non disponible.")
+
             return details
         return ["Tournoi non trouvé."]
 
@@ -219,13 +232,14 @@ class GestionRapport(GestionDeBase):
             details = []
             for tour in tournoi["tours"]:
                 details.append(
-                    f"{tour['nom_tour']}; Début : {tour['date_et_heure_debut']}; Fin : {tour['date_et_heure_fin']}"
+                    f"{tour['nom_tour']}; Début: {tour['date_et_heure_debut']}; Fin: {tour['date_et_heure_fin']}"
                 )
 
                 for match in tour["matches"]:
-                    details.append(
+                    match_info = (
                         f"{match['joueur_1']} vs {match['joueur_2']};"
                         f"Score {match['score_joueur_1']} - {match['score_joueur_2']}"
                     )
-                return details
+                    details.append(match_info)
+            return details
         return ["Tournoi non trouvé"]

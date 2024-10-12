@@ -72,27 +72,31 @@ class ControlsPrincipal:
                 self.menu.afficher_message("Choix invalide , réessayer")
 
     def gerer_rapport(self):
-        choix = self.menu.afficher_menu_rapport()
-        if choix == "1":
-            joueurs = self.gestion_rapports.afficher_joueurs_alphabetique()
-            for joueur in joueurs:
-                self.menu.afficher_message(joueur)
-        elif choix == "2":
-            tournois = self.gestion_rapports.afficher_tournois()
-            for tournoi in tournois:
-                self.menu.afficher_message(tournoi)
-        elif choix == "3":
-            nom_tournoi = self.menu.demander_information("Entre le nom du tournoi : ")
-            details = self.gestion_rapports.afficher_details_tournoi(nom_tournoi, self.gestion_joueur)
-            for detail in details:
-                self.menu.afficher_message(detail)
-        elif choix == "4":
-            nom_tournoi = self.menu.demander_information("Entre le nom du tournoi : ")
-            tours_et_matchs = self.gestion_rapports.afficher_tours_et_matchs(nom_tournoi)
-            for tour in tours_et_matchs:
-                self.menu.afficher_message(tour)
-        else:
-            self.menu.afficher_message("Choix invalide réessayer")
+        while True:
+            choix = self.menu.afficher_menu_rapport()
+            if choix == "1":
+                joueurs = self.gestion_rapports.afficher_joueurs_alphabetique()
+                for joueur in joueurs:
+                    self.menu.afficher_message(joueur)
+            elif choix == "2":
+                tournois = self.gestion_rapports.afficher_tournois()
+                for tournoi in tournois:
+                    self.menu.afficher_message(tournoi)
+            elif choix == "3":
+                nom_tournoi = self.menu.demander_information("Entre le nom du tournoi : ")
+                details = self.gestion_rapports.afficher_details_tournoi(nom_tournoi, self.gestion_joueur)
+                for detail in details:
+                    self.menu.afficher_message(detail)
+            elif choix == "4":
+                nom_tournoi = self.menu.demander_information("Entre le nom du tournoi : ")
+                tours_et_matchs = self.gestion_rapports.afficher_tours_et_matchs(nom_tournoi)
+                for tour in tours_et_matchs:
+                    self.menu.afficher_message(tour)
+            elif choix == "5":
+                self.menu.afficher_message("Retour au menu principal")
+                break
+            else:
+                self.menu.afficher_message("Choix invalide réessayer")
 
     def ajouter_joueur(self):
 
@@ -267,29 +271,43 @@ class ControlsPrincipal:
             self.menu.afficher_message("Tournoi non créé")
             return
 
+        if self.controls_tournois.tournoi.tour_en_cours >= self.controls_tournois.nb_tour:
+            self.menu.afficher_message("Tous les tours sont terminés.")
+            return
+
         date_heure_debut = self.menu.demander_information("Entrez la date et le l'heure du début (JJ/MM/AAA HH:MM): ")
 
-        for i in range(self.controls_tournois.nb_tour):
+        for i in range(self.controls_tournois.tournoi.tour_en_cours, self.controls_tournois.nb_tour):
             self.menu.afficher_message(f"Lancement du tour {i+1}/{self.controls_tournois.nb_tour}")
+
             self.controls_tournois.lancer_nouveau_tour(date_heure_debut)
             self.entrer_resultats_tour()
+
             dernier_tour = self.controls_tournois.tournoi.liste_tours[-1]
             dernier_tour.afficher_matchs()
+
             date_heure_fin = self.menu.demander_information("Entrez la date de fin du tour (JJ/MM/AAA HH:MM): ")
             dernier_tour.date_et_heure_fin = date_heure_fin
 
             self.controls_tournois.tournoi.tour_en_cours += 1
 
-            self.sauvegarder_tournoi()
+            if self.controls_tournois.tournoi.tour_en_cours == self.controls_tournois.nb_tour:
+                self.generer_classement()
+                self.sauvegarder_tournoi()
+                self.menu.afficher_message("Le tournois est terminé.")
+                return
 
             if not self.demander_continuer_ou_quitter():
-                break
+                self.sauvegarder_tournoi()
+                return
             date_heure_debut = date_heure_fin
 
-        if self.controls_tournois.tournoi.tour_en_cours == self.controls_tournois.nb_tour:
-            self.generer_classement()
-
     def continuer_tournoi(self):
+
+        if self.controls_tournois.tournoi.tour_en_cours >= self.controls_tournois.nb_tour:
+            self.menu.afficher_message("Tous les tours sont terminés.")
+            return
+
         date_heure_debut = self.menu.demander_information("Entrez la date et le l'heure du début (JJ/MM/AAA HH:MM): ")
 
         for i in range(self.controls_tournois.tournoi.tour_en_cours, self.controls_tournois.tournoi.nb_tour):
@@ -308,20 +326,25 @@ class ControlsPrincipal:
 
             self.controls_tournois.tournoi.tour_en_cours += 1
 
-            self.sauvegarder_tournoi()
+            if self.controls_tournois.tournoi.tour_en_cours == self.controls_tournois.nb_tour:
+                self.generer_classement()
+                self.sauvegarder_tournoi()
+                self.menu.afficher_message("Le tournois est terminé.")
+                return
 
             if not self.demander_continuer_ou_quitter():
-                break
+                self.sauvegarder_tournoi()
+                return
 
             date_heure_debut = date_heure_fin
-
-        if self.controls_tournois.tournoi.tour_en_cours == self.controls_tournois.nb_tour:
-            self.generer_classement()
 
     def generer_classement(self):
         joueurs = self.controls_tournois.tournoi.liste_joueurs
 
         classement = sorted(joueurs, key=lambda joueur: joueur.score, reverse=True)
+        self.controls_tournois.tournoi.classement = [
+            (joueur.nom, joueur.prenom, joueur.score) for joueur in classement
+        ]
 
         self.menu.afficher_message("Classement final du tournoi :")
         for i, joueur in enumerate(classement, start=1):
@@ -379,8 +402,6 @@ class ControlsPrincipal:
     def demander_continuer_ou_quitter(self):
         choix = self.menu.demander_information("Voulez continuer ou quitter ? ")
         if choix == "q":
-            print("DEBUG: Appel de la sauvegarde avant de quitter.")
-            self.sauvegarder_tournoi()
             self.menu.afficher_message("Vous avez quitté le tournois.")
             return False
         elif choix == "c":
