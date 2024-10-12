@@ -5,7 +5,6 @@ data/tournois.json
 __pycache__/
 notes.txt
 .flake8
-/rapport_flake8
 rapport_flake8/*
 !rapport_flake8/index.html
 pyproject.toml

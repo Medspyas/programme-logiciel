@@ -270,7 +270,7 @@ class ControlsPrincipal:
         if not self.controls_tournois:
             self.menu.afficher_message("Tournoi non créé")
             return
-
+ 
         if self.controls_tournois.tournoi.tour_en_cours >= self.controls_tournois.nb_tour:
             self.menu.afficher_message("Tous les tours sont terminés.")
             return
@@ -302,12 +302,13 @@ class ControlsPrincipal:
                 return
             date_heure_debut = date_heure_fin
 
-    def continuer_tournoi(self):
+ 
 
+    def continuer_tournoi(self): 
         if self.controls_tournois.tournoi.tour_en_cours >= self.controls_tournois.nb_tour:
             self.menu.afficher_message("Tous les tours sont terminés.")
             return
-
+        
         date_heure_debut = self.menu.demander_information("Entrez la date et le l'heure du début (JJ/MM/AAA HH:MM): ")
 
         for i in range(self.controls_tournois.tournoi.tour_en_cours, self.controls_tournois.tournoi.nb_tour):
@@ -324,13 +325,14 @@ class ControlsPrincipal:
             date_heure_fin = self.menu.demander_information("Entrez la date de fin du tour (JJ/MM/AAA HH:MM): ")
             dernier_tour.date_et_heure_fin = date_heure_fin
 
-            self.controls_tournois.tournoi.tour_en_cours += 1
+            self.controls_tournois.tournoi.tour_en_cours += 1 
 
             if self.controls_tournois.tournoi.tour_en_cours == self.controls_tournois.nb_tour:
                 self.generer_classement()
                 self.sauvegarder_tournoi()
                 self.menu.afficher_message("Le tournois est terminé.")
-                return
+                return  
+           
 
             if not self.demander_continuer_ou_quitter():
                 self.sauvegarder_tournoi()
@@ -338,13 +340,13 @@ class ControlsPrincipal:
 
             date_heure_debut = date_heure_fin
 
+        
     def generer_classement(self):
         joueurs = self.controls_tournois.tournoi.liste_joueurs
 
         classement = sorted(joueurs, key=lambda joueur: joueur.score, reverse=True)
-        self.controls_tournois.tournoi.classement = [
-            (joueur.nom, joueur.prenom, joueur.score) for joueur in classement
-        ]
+        self.controls_tournois.tournoi.classement = [(joueur.nom, joueur.prenom, joueur.score)
+                                                     for joueur in classement]
 
         self.menu.afficher_message("Classement final du tournoi :")
         for i, joueur in enumerate(classement, start=1):
@@ -401,7 +403,7 @@ class ControlsPrincipal:
 
     def demander_continuer_ou_quitter(self):
         choix = self.menu.demander_information("Voulez continuer ou quitter ? ")
-        if choix == "q":
+        if choix == "q":            
             self.menu.afficher_message("Vous avez quitté le tournois.")
             return False
         elif choix == "c":
