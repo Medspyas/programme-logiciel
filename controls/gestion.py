@@ -71,7 +71,7 @@ class Gestion_information_joueur(GestionDeBase):
             ]
         return []
 
-    def mettre_a_jour_infos_joueur(self, joueurs, id_nationale, attribut, nouvelle_valeur):
+    """def mettre_a_jour_infos_joueur(self, joueurs, id_nationale, attribut, nouvelle_valeur):
         joueur_trouver = False
         for joueur in joueurs:
             if joueur.id_nationale == id_nationale:
@@ -80,7 +80,7 @@ class Gestion_information_joueur(GestionDeBase):
                 print("l'information a bien été mis à jour.")
         if not joueur_trouver:
             print("Joueur non trouvé.")
-        return joueurs
+        return joueurs"""
 
 
 class Gestion_information_tournoi(GestionDeBase):
@@ -148,8 +148,6 @@ class Gestion_information_tournoi(GestionDeBase):
                     if joueur:
 
                         tournoi.liste_joueurs.append(joueur)
-                    else:
-                        print(f"Joueur avec ID {id_nationale} introuvable.")
 
                 for tour_data in tournoi_data["tours"]:
                     tour = Tour(
@@ -174,29 +172,25 @@ class Gestion_information_tournoi(GestionDeBase):
 
         return None
 
-    def mettre_a_jour_infos_tournoi(self, tournoi, attribut, nouvelle_valeur):
-        if hasattr(tournoi, attribut):
-            setattr(tournoi, attribut, nouvelle_valeur)
-            print("L'information à bien été mis à jour")
-        else:
-            print("L'information est introuvable")
-        return tournoi
-
 
 class GestionRapport(GestionDeBase):
 
     def afficher_joueurs_alphabetique(self, filename="joueurs.json"):
         joueurs = self.charger_fichier(filename)
         joueurs_trier = sorted(joueurs, key=lambda joueur: joueur["nom"])
-        return [f"{joueur['nom']}, {joueur['prenom']}, ID: {joueur['id_nationale']}" for joueur in joueurs_trier]
+        return joueurs_trier
 
     def afficher_tournois(self, filename="tournois.json"):
         tournois = self.charger_fichier(filename)
         return [
-            f"{tournoi['nom']}, du {tournoi['date_debut']} au {tournoi['date_fin']};"
+            f"{tournoi['nom']}, du {tournoi['date_debut']} au {tournoi['date_fin']}; "
             f"{tournoi['description']}; {tournoi['nb_tour']} tours"
             for tournoi in tournois
         ]
+
+    def afficher_tounois_noms(self, filename="tournois.json"):
+        tournois = self.charger_fichier(filename)
+        return [tournoi["nom"] for tournoi in tournois]
 
     def afficher_details_tournoi(self, nom_tournoi, gestion_joueur, filename="tournois.json"):
         tournois = self.charger_fichier(filename)
@@ -225,7 +219,7 @@ class GestionRapport(GestionDeBase):
             return details
         return ["Tournoi non trouvé."]
 
-    def afficher_tours_et_matchs(self, nom_tournoi, filename="tournois.json"):
+    def afficher_tours_et_matchs(self, nom_tournoi, gestion_joueur, filename="tournois.json"):
         tournois = self.charger_fichier(filename)
         tournoi = next((t for t in tournois if t["nom"] == nom_tournoi), None)
         if tournoi:
@@ -236,10 +230,14 @@ class GestionRapport(GestionDeBase):
                 )
 
                 for match in tour["matches"]:
+                    joueur_1 = gestion_joueur.trouver_joueur_par_id(match["joueur_1"])
+                    joueur_2 = gestion_joueur.trouver_joueur_par_id(match["joueur_2"])
+
                     match_info = (
-                        f"{match['joueur_1']} vs {match['joueur_2']};"
+                        f"{joueur_1.nom} {joueur_1.prenom} vs {joueur_2.nom} {joueur_2.prenom}; "
                         f"Score {match['score_joueur_1']} - {match['score_joueur_2']}"
                     )
                     details.append(match_info)
+                details.append("")
             return details
         return ["Tournoi non trouvé"]

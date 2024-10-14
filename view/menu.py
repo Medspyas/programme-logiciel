@@ -14,16 +14,14 @@ class MenuPrincipal:
         print("\nMenu Gestion des Joueurs:")
         print("1. Ajouter un joueur")
         print("2. Modifier un joueur")
-        print("3. Sauvegarder les joueurs")
-        print("4. Retour au menu principal")
+        print("3. Retour au menu principal")
         return input("Faite votre choix : ")
 
     def afficher_menu_tournois(self):
         print("\nMenu Gestion des Tournois:")
         print("1. Créer un tournois")
         print("2. Lancer un tournois")
-        print("3. Sauvegarder tournois")
-        print("4. Retour au menu principal")
+        print("3. Retour au menu principal")
         return input("Faite votre choix : ")
 
     def afficher_menu_rapport(self):
