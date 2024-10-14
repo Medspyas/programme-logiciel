@@ -279,14 +279,25 @@ class ControlsPrincipal:
                 self.menu.afficher_message("Choix invalide, réessayez.")
 
     def creer_tournoi(self):
+        while True:
+            nom_tournoi = self.menu.demander_information("Entre le nom du tournoi: ").strip()
+            if nom_tournoi:
+                break
+            else:
+                self.menu.afficher_message("Le nom du tournois ne peut pas être vide.")
 
-        nom_tournoi = self.valider_champ("Entre le nom du tournoi: ")
+
 
         date_debut_tournoi = self.valider_date("Entre la date du début du tournoi: ")
 
         date_fin_tournoi = self.valider_date("Entre la date de fin du tournoi: ")
 
-        description = self.valider_champ("Entrez la description du tournoi: ")
+        while True:
+            description = self.menu.demander_information("Entre le nom de la description: ").strip()
+            if description:
+                break
+            else:
+                self.menu.afficher_message("Le nom de la description ne peut pas être vide.")
 
         joueurs_disponible = self.gestion_joueur.liste_joueurs
         self.afficher_joueur()
