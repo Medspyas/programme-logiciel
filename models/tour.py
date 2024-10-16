@@ -1,4 +1,5 @@
 class Tour:
+    # Représente un tour pendant un tournois.
     def __init__(self, nom_tour, date_et_heure_debut, date_et_heure_fin=None):
         self.nom_tour = nom_tour
         self.liste_matches = []
@@ -7,9 +8,11 @@ class Tour:
         self.score_match = None
 
     def ajouter_match(self, match):
+        # Ajoute un match dans une lite.
         self.liste_matches.append(match)
 
     def afficher_matchs(self):
+        # Affiche les informations d'un match
         for match in self.liste_matches:
             resultat = match.stockage_resultat_joueur()
             print(resultat)

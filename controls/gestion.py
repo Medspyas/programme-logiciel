@@ -12,20 +12,24 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 class GestionDeBase:
+    # Gere la création de dossier. sauvegarde et charge un fichier.
     def __init__(self, dossier_data="data"):
         self.dossier_data = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", dossier_data))
         if not os.path.exists(self.dossier_data):
             os.makedirs(self.dossier_data)
 
     def chemin_fichier(self, filename):
+        # Crée un dossier et defini un chemin de sauvegarde.
         return os.path.join(self.dossier_data, filename)
 
     def sauvegarder_fichier(self, filename, data):
+        # Sauvegarde un fichier.
         chemin_fichier = self.chemin_fichier(filename)
         with open(chemin_fichier, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
 
     def charger_fichier(self, filename):
+        # Charge un fichier.
         chemin_fichier = self.chemin_fichier(filename)
         if os.path.exists(chemin_fichier):
             with open(chemin_fichier, "r", encoding="utf-8") as f:
@@ -35,8 +39,9 @@ class GestionDeBase:
 
 
 class Gestion_information_joueur(GestionDeBase):
+    # Gère la sauvegarde et chargement des informations joueurs.
     def sauvegarder_joueurs(self, joueurs, filename="joueurs.json"):
-
+        # Sauvegarde les informations joueur.
         joueurs_existants = self.charger_joueurs(filename)
 
         joueurs_dict = {joueur.id_nationale: joueur for joueur in joueurs_existants}
@@ -57,6 +62,7 @@ class Gestion_information_joueur(GestionDeBase):
         self.sauvegarder_fichier(filename, listes_joueurs_dict)
 
     def charger_joueurs(self, filename="joueurs.json"):
+        # Charge les informations joueur.
         data = self.charger_fichier(filename)
         if data:
             return [
@@ -71,21 +77,11 @@ class Gestion_information_joueur(GestionDeBase):
             ]
         return []
 
-    """def mettre_a_jour_infos_joueur(self, joueurs, id_nationale, attribut, nouvelle_valeur):
-        joueur_trouver = False
-        for joueur in joueurs:
-            if joueur.id_nationale == id_nationale:
-                setattr(joueur, attribut, nouvelle_valeur)
-                joueur_trouver = True
-                print("l'information a bien été mis à jour.")
-        if not joueur_trouver:
-            print("Joueur non trouvé.")
-        return joueurs"""
-
 
 class Gestion_information_tournoi(GestionDeBase):
+    # Gère la sauvegarde et chargement des informations tournois.
     def sauvegarder_tous_les_tournois(self, tournois, filename="tournois.json"):
-
+        # Sauvegarde les tournois créer.
         tournois_existants = self.charger_fichier(filename) or []
 
         tournois_dict = {t_existant["nom"]: t_existant for t_existant in tournois_existants}
@@ -123,6 +119,7 @@ class Gestion_information_tournoi(GestionDeBase):
         self.sauvegarder_fichier(filename, list(tournois_dict.values()))
 
     def charger_tous_les_tournois(self, gestion_joueurs, filename):
+        # Charge les informations des tournois
         data = self.charger_fichier(filename)
         if not data:
             return []
@@ -174,13 +171,15 @@ class Gestion_information_tournoi(GestionDeBase):
 
 
 class GestionRapport(GestionDeBase):
-
+    # Gère les rapports des différentes inforamtions joueurs et tournois.
     def afficher_joueurs_alphabetique(self, filename="joueurs.json"):
+        # Renvoie la liste de tous les joueurs sauvegardés trier.
         joueurs = self.charger_fichier(filename)
         joueurs_trier = sorted(joueurs, key=lambda joueur: joueur["nom"])
         return joueurs_trier
 
     def afficher_tournois(self, filename="tournois.json"):
+        # Renvoie la liste des tournois sauvegardés.
         tournois = self.charger_fichier(filename)
         return [
             f"{tournoi['nom']}, du {tournoi['date_debut']} au {tournoi['date_fin']}; "
@@ -189,10 +188,12 @@ class GestionRapport(GestionDeBase):
         ]
 
     def afficher_tounois_noms(self, filename="tournois.json"):
+        # Renvoie le nom des différents tournois.
         tournois = self.charger_fichier(filename)
         return [tournoi["nom"] for tournoi in tournois]
 
     def afficher_details_tournoi(self, nom_tournoi, gestion_joueur, filename="tournois.json"):
+        # Renvoie les informations d'un tournois
         tournois = self.charger_fichier(filename)
         tournoi = next((t for t in tournois if t["nom"] == nom_tournoi), None)
         if tournoi:
@@ -220,6 +221,7 @@ class GestionRapport(GestionDeBase):
         return ["Tournoi non trouvé."]
 
     def afficher_tours_et_matchs(self, nom_tournoi, gestion_joueur, filename="tournois.json"):
+        # Renvoie les informations des différents tours et matchs d'un tournois.
         tournois = self.charger_fichier(filename)
         tournoi = next((t for t in tournois if t["nom"] == nom_tournoi), None)
         if tournoi:

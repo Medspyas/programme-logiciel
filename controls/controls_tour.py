@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 class ControlsTour:
+    # Controleur pour gérer les opérations liées aux tours.
     def __init__(self, tour, tournoi, menu):
         self.tour = tour
         self.tournoi = tournoi
@@ -14,6 +15,7 @@ class ControlsTour:
         self.tour_terminer = False
 
     def verifier_rencontre_joueurs(self, joueur_1, joueur_2):
+        # Verifie si deux joueurs ce sont déja rencontrés durant les tours précédent.
         for tour in self.tournoi.liste_tours:
             for match in tour.liste_matches:
                 if (match.joueur_1 == joueur_1 and match.joueur_2 == joueur_2) or (
@@ -23,6 +25,7 @@ class ControlsTour:
         return False
 
     def generer_matchs(self):
+        # Génère les matchs d'un tour en faisant en sorte que chaque est différent.
         liste_joueurs = self.tournoi.liste_joueurs
 
         if len(liste_joueurs) % 2 != 0:

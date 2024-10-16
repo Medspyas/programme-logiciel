@@ -20,7 +20,7 @@ class MenuPrincipal:
     def afficher_menu_tournois(self):
         print("\nMenu Gestion des Tournois:")
         print("1. Créer un tournois")
-        print("2. Lancer un tournois")
+        print("2. Continuer un tournois")
         print("3. Retour au menu principal")
         return input("Faite votre choix : ")
 
@@ -31,7 +31,7 @@ class MenuPrincipal:
         print("3. Information d'un tournois")
         print("4. Listes tours et matchs d'un tournois")
         print("5. Retour au menu principal")
-        return input("Faite votre choix : ")
+        return input("Faite votre choix : \n")
 
     def afficher_message(self, message):
         print(message)

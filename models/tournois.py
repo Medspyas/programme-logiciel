@@ -1,4 +1,5 @@
 class Tournoi:
+    # Rprésente un tournois
     def __init__(self, nom, date_debut, date_fin, description, liste_joueurs, nb_tour):
         self.nom = nom
         self.date_debut = date_debut
@@ -11,5 +12,6 @@ class Tournoi:
         self.classement = []
 
     def ajouter_tour(self, tour):
+        # Ajoute un tour dans une lsite
         self.liste_tours.append(tour)
         return self.liste_tours
