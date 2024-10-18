@@ -181,6 +181,9 @@ class GestionRapport(GestionDeBase):
     def afficher_tournois(self, filename="tournois.json"):
         # Renvoie la liste des tournois sauvegardés.
         tournois = self.charger_fichier(filename)
+        if not tournois:
+            return []
+
         return [
             f"{tournoi['nom']}, du {tournoi['date_debut']} au {tournoi['date_fin']}; "
             f"{tournoi['description']}; {tournoi['nb_tour']} tours"
@@ -190,6 +193,10 @@ class GestionRapport(GestionDeBase):
     def afficher_tounois_noms(self, filename="tournois.json"):
         # Renvoie le nom des différents tournois.
         tournois = self.charger_fichier(filename)
+
+        if not tournois:
+            return []
+
         return [tournoi["nom"] for tournoi in tournois]
 
     def afficher_details_tournoi(self, nom_tournoi, gestion_joueur, filename="tournois.json"):

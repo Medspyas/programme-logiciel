@@ -101,13 +101,18 @@ class ControlsPrincipal:
                 self.menu.afficher_message("Choix invalide réessayer")
 
     def afficher_joueurs_alphabetique(self):
+
+        joueurs_trier = self.gestion_rapports.afficher_joueurs_alphabetique()
+        if not joueurs_trier:
+            self.menu.afficher_message("Auncun joueur disponible.")
+            return
+
         titres = ["ID Nationale", "Nom", "prenom", "Date de naissance"]
         largeurs = [len(titre) + 7 for titre in titres]
         self.menu.afficher_message(
             f"{titres[0]:<{largeurs[0]}} {titres[1]:<{largeurs[1]}}"
             f"{titres[2]:<{largeurs[2]}} {titres[3]:<{largeurs[3]}}"
         )
-        joueurs_trier = self.gestion_rapports.afficher_joueurs_alphabetique()
         for joueur in joueurs_trier:
             self.menu.afficher_message(
                 f"{joueur['id_nationale']:<{largeurs[0]}} {joueur['nom']:<{largeurs[1]}}"
@@ -116,33 +121,59 @@ class ControlsPrincipal:
 
     def afficher_tournois(self):
         tournois = self.gestion_rapports.afficher_tournois()
+        if not tournois:
+            self.menu.afficher_message("Auncun tournoi disponible.")
+            return
         for tournoi in tournois:
             self.menu.afficher_message(tournoi)
 
     def afficher_details_tournoi(self):
         tournois = self.gestion_rapports.afficher_tounois_noms()
-        if tournois:
-            self.menu.afficher_message("Liste de tournois :")
-            for tournoi in tournois:
-                self.menu.afficher_message(tournoi)
+        if not tournois:
+            self.menu.afficher_message("Auncun tournoi disponible.")
+            return
 
+        self.menu.afficher_message("Liste de tournois :")
+        for tournoi in tournois:
+            self.menu.afficher_message(tournoi)
+
+        while True:
             nom_tournoi = self.menu.demander_information("Entre le nom du tournoi : ")
+            if not nom_tournoi:
+                self.menu.afficher_message("Choix invalide.")
+                continue
+
             details = self.gestion_rapports.afficher_details_tournoi(nom_tournoi, self.gestion_joueur)
-            for detail in details:
-                self.menu.afficher_message(detail)
-        else:
-            self.menu.afficher_message("Aucun tournoi disponible.")
+            if not details:
+                self.menu.afficher_message(f"Le tournoi {nom_tournoi} n'a pas été trouvé.")
+            else:
+                for detail in details:
+                    self.menu.afficher_message(detail)
+                break
 
     def afficher_tours_et_matchs(self):
         tournois = self.gestion_rapports.afficher_tounois_noms()
-        if tournois:
-            self.menu.afficher_message("Liste de tournois :")
-            for tournoi in tournois:
-                self.menu.afficher_message(tournoi)
+
+        if not tournois:
+            self.menu.afficher_message("Auncun tournoi disponible.")
+            return
+
+        self.menu.afficher_message("Liste de tournois :")
+        for tournoi in tournois:
+            self.menu.afficher_message(tournoi)
+        while True:
             nom_tournoi = self.menu.demander_information("Entre le nom du tournoi : ")
+            if not nom_tournoi:
+                self.menu.afficher_message("Choix invalide.")
+                continue
+
             tours_et_matchs = self.gestion_rapports.afficher_tours_et_matchs(nom_tournoi, self.gestion_joueur)
-            for tour in tours_et_matchs:
-                self.menu.afficher_message(tour)
+            if not tours_et_matchs:
+                self.menu.afficher_message(f"Aucun tour et match trouvé pour le tournoi {nom_tournoi}.")
+            else:
+                for tour in tours_et_matchs:
+                    self.menu.afficher_message(tour)
+                break
 
     def valider_champ(self, message):
         # Vérifie que le nom/prenom contient uniquement des lettres et n'est pas vide.
@@ -178,23 +209,27 @@ class ControlsPrincipal:
                 and date_heure_str[10] == " "
                 and date_heure_str[13] == ":"
             ):
-                date_partie, heure_partie = date_heure_str.split(" ")
+                try:
+                    date_partie, heure_partie = date_heure_str.split(" ")
 
-                jour, mois, annee = date_partie.split("/")
-                heure, minute = heure_partie.split(":")
+                    jour, mois, annee = date_partie.split("/")
+                    heure, minute = heure_partie.split(":")
 
-                if jour.isdigit() and mois.isdigit() and annee.isdigit() and heure.isdigit() and minute.isdigit():
-                    jour, mois, annee = int(jour), int(mois), int(annee)
-                    heure, minute = int(heure), int(minute)
+                    if jour.isdigit() and mois.isdigit() and annee.isdigit() and heure.isdigit() and minute.isdigit():
+                        jour, mois, annee = int(jour), int(mois), int(annee)
+                        heure, minute = int(heure), int(minute)
 
-                    if (
-                        1 <= jour <= 31
-                        and 1 <= mois <= 12
-                        and 1900 <= annee <= 2100
-                        and 0 <= heure <= 23
-                        and 0 <= minute <= 59
-                    ):
-                        return date_heure_str
+                        if (
+                            1 <= jour <= 31
+                            and 1 <= mois <= 12
+                            and 1900 <= annee <= 2100
+                            and 0 <= heure <= 23
+                            and 0 <= minute <= 59
+                        ):
+                            return date_heure_str
+                except ValueError:
+                    pass
+
             self.menu.afficher_message(
                 "Format invalide. Veuillez entrer un date et une heure au format JJ/MM/AAA HH:MM."
             )
@@ -305,8 +340,6 @@ class ControlsPrincipal:
         # Crée un tournoi
 
         joueurs_disponible = self.gestion_joueur.liste_joueurs
-
-        print(f"Nombre de joueurs disponibles : {len(joueurs_disponible)}")
 
         if len(joueurs_disponible) < 8:
             self.menu.afficher_message("Erreur : vous devez crée au moins 8 joueurs pour crée un tournois.")
@@ -527,7 +560,7 @@ class ControlsPrincipal:
 
     def demander_continuer_ou_quitter(self):
         # Permet de quitter a la fin d'un tour.
-        choix = self.menu.demander_information("Voulez continuer ou quitter ? ")
+        choix = self.menu.demander_information("Voulez continuer ou quitter ? (q) pour quitter/ (c) pour continuer")
         if choix == "q":
             self.menu.afficher_message("Vous avez quitté le tournois.")
             return False
@@ -564,4 +597,5 @@ def main():
     controls_principal.lancer_menu_principal()
 
 
-main()
+if __name__ == "__main__":
+    main()

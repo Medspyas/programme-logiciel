@@ -32,10 +32,8 @@ class GestionJoueurs:
     def obtenir_tous_les_joueurs(self):
         # Renvoi une liste de tous les joueurs ajoutés.
         if not self.liste_joueurs:
-            print("Aucun joueur en mémoire, tentative de chargement depuis le fichier JSON.")
             joueur_charges = self.gestion_information_joueur.charger_joueurs()
             if joueur_charges:
-                print(f"{len(self.liste_joueurs)} joueurs chargés en mémoire.")
                 self.liste_joueurs = joueur_charges
         return self.liste_joueurs
 
