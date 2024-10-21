@@ -318,18 +318,17 @@ class ControlsPrincipal:
             )
 
             nouvel_id = self.menu.demander_information("Entre l' ID nationale: ( ex: AA111)") or joueur.id_nationale
-            if nouvel_id != joueur.id_nationale:
-                joueur_existant = self.controls_joueurs.trouver_joueur(nouvel_id)
-                if joueur_existant:
-                    self.menu.afficher_message("L'ID est deja utilisé par un autre joueur. ")
-                    return
-                else:
-                    self.controls_joueurs.mettre_a_jour_infos_joueur(id_nationale, "id_nationale", nouvel_id)
-                    joueur = self.controls_joueurs.trouver_joueur(nouvel_id)
+            joueur_existant = self.controls_joueurs.trouver_joueur(nouvel_id)
+            if joueur_existant and nouvel_id != joueur.id_nationale:
+                self.menu.afficher_message("L'ID est deja utilisé par un autre joueur. ")
+                return
 
             self.controls_joueurs.mettre_a_jour_infos_joueur(id_nationale, "nom", nom)
             self.controls_joueurs.mettre_a_jour_infos_joueur(id_nationale, "prenom", prenom)
             self.controls_joueurs.mettre_a_jour_infos_joueur(id_nationale, "date_de_naissance", date_de_naissance)
+
+            if nouvel_id != joueur.id_nationale:
+                self.controls_joueurs.mettre_a_jour_infos_joueur(id_nationale, "id_nationale", nouvel_id)
 
             self.sauvegarder_joueurs()
             self.menu.afficher_message("L'ID à été modifier avec succès")
@@ -367,10 +366,14 @@ class ControlsPrincipal:
 
         selection_joueur = self.selectionner_joueurs(joueurs_disponible)
 
+        for joueur in selection_joueur:
+            joueur.score = 0
+
         tournoi = Tournoi(nom_tournoi, date_debut_tournoi, date_fin_tournoi, description, selection_joueur, nb_tour=4)
 
         self.controls_tournois = ControlsTournois(tournoi, self.menu)
         self.liste_tournois.append(tournoi)
+        self.sauvegarder_tournoi()
         self.lancer_tournoi()
 
     def afficher_joueur(self):
@@ -433,13 +436,16 @@ class ControlsPrincipal:
         date_heure_debut = self.valider_date_et_heure("Entrez la date et le l'heure du début (JJ/MM/AAA HH:MM): ")
 
         for i in range(self.controls_tournois.tournoi.tour_en_cours, self.controls_tournois.nb_tour):
-            self.menu.afficher_message(f"Lancement du tour {i+1}/{self.controls_tournois.nb_tour}")
+            self.menu.afficher_message(f"Tour {i+1}/{self.controls_tournois.nb_tour}")
 
             self.controls_tournois.lancer_nouveau_tour(date_heure_debut)
             self.entrer_resultats_tour()
 
             dernier_tour = self.controls_tournois.tournoi.liste_tours[-1]
-            dernier_tour.afficher_matchs()
+            resultats_matchs = dernier_tour.afficher_matchs()
+            for resultat in resultats_matchs:
+                self.menu.afficher_message(resultat)
+                self.menu.afficher_message("")
 
             date_heure_fin = self.valider_date_et_heure("Entrez la date de fin du tour (JJ/MM/AAA HH:MM): ")
             dernier_tour.date_et_heure_fin = date_heure_fin
@@ -473,13 +479,16 @@ class ControlsPrincipal:
         for i in range(self.controls_tournois.tournoi.tour_en_cours, self.controls_tournois.tournoi.nb_tour):
 
             self.menu.afficher_message(
-                f"{self.controls_tournois.tournoi.tour_en_cours+1}/{self.controls_tournois.tournoi.nb_tour}"
+                f"Tour {self.controls_tournois.tournoi.tour_en_cours+1}/{self.controls_tournois.tournoi.nb_tour}"
             )
             self.controls_tournois.lancer_nouveau_tour(date_heure_debut)
             self.entrer_resultats_tour()
 
             dernier_tour = self.controls_tournois.tournoi.liste_tours[-1]
-            dernier_tour.afficher_matchs()
+            resultats_matchs = dernier_tour.afficher_matchs()
+            for resultat in resultats_matchs:
+                self.menu.afficher_message(resultat)
+                self.menu.afficher_message("")
 
             date_heure_fin = self.valider_date_et_heure("Entrez la date de fin du tour (JJ/MM/AAA HH:MM): ")
             dernier_tour.date_et_heure_fin = date_heure_fin
@@ -557,10 +566,11 @@ class ControlsPrincipal:
                 match.joueur_2.mettre_a_jour_score(0.5)
                 match.score_joueur_1 = 0.5
                 match.score_joueur_2 = 0.5
+        self.sauvegarder_joueurs()
 
     def demander_continuer_ou_quitter(self):
         # Permet de quitter a la fin d'un tour.
-        choix = self.menu.demander_information("Voulez continuer ou quitter ? (q) pour quitter/ (c) pour continuer")
+        choix = self.menu.demander_information("Voulez continuer ou quitter ? (q) pour quitter/ (c) pour continuer: ")
         if choix == "q":
             self.menu.afficher_message("Vous avez quitté le tournois.")
             return False

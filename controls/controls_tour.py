@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 
 from models.match import Match
 
@@ -30,6 +31,17 @@ class ControlsTour:
 
         if len(liste_joueurs) % 2 != 0:
             return
+
+        liste_joueurs.sort(key=lambda joueur: joueur.score, reverse=True)
+
+        i = 0
+        while i < len(liste_joueurs) - 1:
+            if liste_joueurs[i].score == liste_joueurs[i + 1].score:
+                paire = [liste_joueurs[i], liste_joueurs[i + 1]]
+                random.shuffle(paire)
+
+                liste_joueurs[i], liste_joueurs[i + 1] = paire
+            i += 2
 
         nb_match = len(liste_joueurs) // 2
         match_crees = 0

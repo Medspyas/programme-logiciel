@@ -12,7 +12,9 @@ class Tour:
         self.liste_matches.append(match)
 
     def afficher_matchs(self):
-        # Affiche les informations d'un match
+        # Renvoie les informations d'un match
+        resultats = []
         for match in self.liste_matches:
             resultat = match.stockage_resultat_joueur()
-            print(resultat)
+            resultats.append(resultat)
+        return resultats
