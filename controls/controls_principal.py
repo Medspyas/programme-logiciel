@@ -305,6 +305,9 @@ class ControlsPrincipal:
         self.menu.afficher_message("Liste de joueurs disponibles :")
         self.controls_joueurs.afficher_joueurs()
 
+        if not self.controls_joueurs.gestion_joueurs.liste_joueurs:
+            return
+
         id_nationale = self.menu.demander_information("Entre l' ID nationale: ( ex: AA111)")
         joueur = self.controls_joueurs.trouver_joueur(id_nationale)
 
@@ -591,8 +594,6 @@ def main():
     joueurs_charges = gestion_information_joueur.charger_joueurs()
     gestion_joueur.liste_joueurs = joueurs_charges
     gestion_rapports = GestionRapport()
-    if not gestion_joueur.liste_joueurs:
-        menu.afficher_message("Auncun joueur n'a été trouvé. Ajouter des joueurs.")
     controls_principal = ControlsPrincipal(
         menu,
         controls_joueur,

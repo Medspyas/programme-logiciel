@@ -175,6 +175,9 @@ class GestionRapport(GestionDeBase):
     def afficher_joueurs_alphabetique(self, filename="joueurs.json"):
         # Renvoie la liste de tous les joueurs sauvegardés trier.
         joueurs = self.charger_fichier(filename)
+        if not joueurs:
+            return None
+
         joueurs_trier = sorted(joueurs, key=lambda joueur: joueur["nom"])
         return joueurs_trier
 
