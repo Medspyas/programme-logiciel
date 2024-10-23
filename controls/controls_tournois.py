@@ -1,7 +1,9 @@
 import os
+import random
 import sys
 
 from controls_tour import ControlsTour
+
 from models.tour import Tour
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -22,6 +24,9 @@ class ControlsTournois:
 
             self.menu.afficher_message("Tournois terminer. tous les tours ont été joués.")
             return
+
+        if nb_tour_actuel == 0:
+            random.shuffle(self.tournoi.liste_joueurs)
 
         nouveau_tour = Tour(f"Tour {nb_tour_actuel + 1}", date_heure_debut)
         controls_nouveau_tour = ControlsTour(nouveau_tour, self.tournoi, self.menu)

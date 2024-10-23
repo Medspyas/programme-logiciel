@@ -2,7 +2,6 @@ import json
 import os
 import sys
 
-
 from models.joueur import Joueur
 from models.match import Match
 from models.tour import Tour

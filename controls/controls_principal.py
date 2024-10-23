@@ -9,7 +9,6 @@ from models.joueur import GestionJoueurs
 from models.tournois import Tournoi
 from view.menu import MenuPrincipal
 
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
@@ -371,6 +370,8 @@ class ControlsPrincipal:
 
         for joueur in selection_joueur:
             joueur.score = 0
+
+        self.sauvegarder_joueurs()
 
         tournoi = Tournoi(nom_tournoi, date_debut_tournoi, date_fin_tournoi, description, selection_joueur, nb_tour=4)
 
